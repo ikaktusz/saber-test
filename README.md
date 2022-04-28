@@ -9,4 +9,6 @@
 `pip install -r reqirements.txt`  
 `python app.py`  
 
-Желательно использовать виртуальное окружение.
+Желательно использовать виртуальное окружение.  
+
+![calc](https://user-images.githubusercontent.com/51374536/165834053-db87b834-7fe2-495e-bbb1-72d035861780.png)
