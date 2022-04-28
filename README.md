@@ -4,7 +4,7 @@
 
 ## Установка
 
-`git clone git@github.com:ikaktusz/saber-test.git`  
+`git clone https://github.com/ikaktusz/saber-test.git`  
 `cd saber-test`  
 `pip install -r reqirements.txt`  
 `python app.py`  
