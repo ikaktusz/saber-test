@@ -25,24 +25,14 @@ BUTTONS = {
 }
 
 
-class BracketsMatchError(Exception): pass
+class Calculator(object):
 
-
-class Ui_MainWindow(object):
-
-
-    def setupUi(self, MainWindow):
-        MainWindow.setWindowTitle('Calculator')
-        MainWindow.setFixedSize(420, 400)
-        MainWindow.setStyleSheet("background-color: rgb(0, 0, 0);")
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
-        self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(10, 10, 403, 380))
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
-        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
-
+    def __init__(self):
+        self._create_main_window()
+        self.centralwidget = QtWidgets.QWidget(self.MainWindow)
+        self._create_vertical_layout()
         self._setup_font()
-        self.display = self._create_display()
+        self._create_display()
         self.gridLayout = QtWidgets.QGridLayout()
 
         self.buttons = []
@@ -52,75 +42,106 @@ class Ui_MainWindow(object):
             self.gridLayout.addWidget(new_button, *coords)
             self.buttons.append(new_button)
 
-
         self.verticalLayout.addLayout(self.gridLayout)
-        MainWindow.setCentralWidget(self.centralwidget)
-
+        self.MainWindow.setCentralWidget(self.centralwidget)
 
         for btn in self.buttons:
             btn.clicked.connect(lambda checked, btn=btn: self._pushed_btn(btn))
 
-    
+    def show(self): self.MainWindow.show()
+
+    def _create_main_window(self):
+        self.MainWindow = QtWidgets.QMainWindow()
+        self.MainWindow.setWindowTitle('Calculator')
+        self.MainWindow.setFixedSize(420, 400)
+        self.MainWindow.setStyleSheet("background-color: rgb(0, 0, 0);")
+
+    def _create_vertical_layout(self):
+        self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(10, 10, 403, 380))
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+
     def _setup_font(self):
         self.font = QtGui.QFont()
         self.font.setFamily("Consolas")
         self.font.setPointSize(15)
         self.font.setWeight(50)
-    
+
     def _create_btn(self, btn_name):
         button = QtWidgets.QPushButton(text=btn_name)
         button.setMinimumSize(QtCore.QSize(0, 75))
         button.setFont(self.font)
-        button.setStyleSheet("background-color: rgb(49, 49, 49); color: rgb(255, 255, 255);")
+        button.setStyleSheet(
+            "background-color: rgb(49, 49, 49); color: rgb(255, 255, 255);"
+            )
         return button
 
     def _create_display(self):
-        display = QtWidgets.QLabel(self.verticalLayoutWidget)
-        display.setFont(self.font)
-        display.setStyleSheet("background-color: rgb(61, 61, 61); color: rgb(255, 255, 255);")
-        display.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        display.setText('0')
-        self.verticalLayout.addWidget(display)
-        return display
+        self.display = QtWidgets.QLabel(self.verticalLayoutWidget)
+        self.display.setFont(self.font)
+        self.display.setStyleSheet(
+            "background-color: rgb(61, 61, 61); color: rgb(255, 255, 255);"
+            )
+        self.display.setAlignment(
+            QtCore.Qt.AlignRight |
+            QtCore.Qt.AlignTrailing |
+            QtCore.Qt.AlignVCenter
+            )
+        self.display.setText('0')
+        self.verticalLayout.addWidget(self.display)
 
     def _pushed_btn(self, btn):
         if btn.text() == 'C':
             self.display.setText('0')
+            return
 
         elif btn.text() == '=':
             self._calculate_result()
+            return
+
+        elif self.display.text() == '':
+            self.display.setText('0')
+            return
 
         elif btn.text() == '<=':
-            text = self.display.text()[:-1]
-            self.display.setText(text)
-        
-        elif btn.text() in ['+', '-', '*', '/', '.'] and self.display.text() == '0':
+            if len(self.display.text()) > 1:
+                text = self.display.text()[:-1]
+                self.display.setText(text)
+                return
+            else:
+                self.display.setText('0')
+                return
+
+        elif (btn.text() in ['+', '-', '*', '/', '.']
+                and self.display.text() == '0'):
+
             text = '0' + btn.text()
             self.display.setText(text)
+            return
 
-        else:
-            if self.display.text() == '0' or self.display.text() == 'Division by 0' or self.display.text() == 'Error':
-                self.display.setText('')
-            
-            text = self.display.text() + btn.text()
-            self.display.setText(text)
-
-        if self.display.text() == '':
+        elif not self.display.text():
             self.display.setText('0')
+            return
 
+        if (self.display.text() == '0'
+                or any([x.isalpha() for x in self.display.text()])):
+
+            self.display.setText('')
+
+        text = self.display.text() + btn.text()
+        self.display.setText(text)
 
     def _calculate_result(self):
         try:
-            if self.display.text().count('(') != self.display.text().count(')'):
-                raise BracketsMatchError
             result = eval(self.display.text())
         except ZeroDivisionError:
             self.display.setText('Division by 0')
             return
-        except (SyntaxError, TypeError, BracketsMatchError):
+        except (SyntaxError, TypeError, NameError):
             self.display.setText('Error')
             return
-        
+
         if result == int(result):
             self.display.setText(str(int(result)))
         else:

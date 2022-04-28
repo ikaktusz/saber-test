@@ -1,10 +1,10 @@
-from calculator.calc import Ui_MainWindow, QtWidgets
 import sys
+
+from calculator.calc import Calculator, QtWidgets
+
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
+    ui = Calculator()
+    ui.show()
     sys.exit(app.exec_())
