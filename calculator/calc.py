@@ -28,68 +28,76 @@ BUTTONS = {
 class Calculator(object):
 
     def __init__(self):
-        self._create_main_window()
-        self.centralwidget = QtWidgets.QWidget(self.MainWindow)
-        self._create_vertical_layout()
-        self._setup_font()
-        self._create_display()
+        self.main_window = self._create_main_window()
+        self.central_widget = QtWidgets.QWidget(self.main_window)
+        self.vl_widget, self.vl = self._create_vl()
+        self.font = self._setup_font()
+        self.display = self._create_display()
         self.gridLayout = QtWidgets.QGridLayout()
-
-        self.buttons = []
-
-        for btn_name, coords in BUTTONS.items():
-            new_button = self._create_btn(btn_name)
-            self.gridLayout.addWidget(new_button, *coords)
-            self.buttons.append(new_button)
-
-        self.verticalLayout.addLayout(self.gridLayout)
-        self.MainWindow.setCentralWidget(self.centralwidget)
+        self.buttons = self._create_btns()
+        self.vl.addLayout(self.gridLayout)
+        self.main_window.setCentralWidget(self.central_widget)
 
         for btn in self.buttons:
             btn.clicked.connect(lambda checked, btn=btn: self._pushed_btn(btn))
 
-    def show(self): self.MainWindow.show()
+    def show(self): self.main_window.show()
 
     def _create_main_window(self):
-        self.MainWindow = QtWidgets.QMainWindow()
-        self.MainWindow.setWindowTitle('Calculator')
-        self.MainWindow.setFixedSize(420, 400)
-        self.MainWindow.setStyleSheet("background-color: rgb(0, 0, 0);")
+        main_window = QtWidgets.QMainWindow()
+        main_window.setWindowTitle('Calculator')
+        main_window.setFixedSize(420, 400)
+        main_window.setStyleSheet("background-color: rgb(0, 0, 0);")
+        return main_window
 
-    def _create_vertical_layout(self):
-        self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(10, 10, 403, 380))
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
-        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+    # Create Vertical Layout
+    def _create_vl(self):
+        vl_widget = QtWidgets.QWidget(self.central_widget)
+        vl_widget.setGeometry(QtCore.QRect(10, 10, 403, 380))
+        vl = QtWidgets.QVBoxLayout(vl_widget)
+        vl.setContentsMargins(0, 0, 0, 0)
+        return vl_widget, vl
 
     def _setup_font(self):
-        self.font = QtGui.QFont()
-        self.font.setFamily("Consolas")
-        self.font.setPointSize(15)
-        self.font.setWeight(50)
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(15)
+        font.setWeight(50)
+        return font
 
-    def _create_btn(self, btn_name):
-        button = QtWidgets.QPushButton(text=btn_name)
-        button.setMinimumSize(QtCore.QSize(0, 75))
-        button.setFont(self.font)
-        button.setStyleSheet(
-            "background-color: rgb(49, 49, 49); color: rgb(255, 255, 255);"
-            )
-        return button
+    def _create_btns(self) -> list[QtWidgets.QPushButton]:
+        buttons = []
+
+        for btn_name, coords in BUTTONS.items():
+            new_button = QtWidgets.QPushButton(text=btn_name)
+            new_button.setMinimumSize(QtCore.QSize(0, 75))
+            new_button.setFont(self.font)
+            new_button.setStyleSheet(
+                "background-color: rgb(49, 49, 49);\n"
+                "color: rgb(255, 255, 255);"
+                )
+
+            self.gridLayout.addWidget(new_button, *coords)
+            buttons.append(new_button)
+        return buttons
+
 
     def _create_display(self):
-        self.display = QtWidgets.QLabel(self.verticalLayoutWidget)
-        self.display.setFont(self.font)
-        self.display.setStyleSheet(
-            "background-color: rgb(61, 61, 61); color: rgb(255, 255, 255);"
+        display = QtWidgets.QLabel(self.vl_widget)
+        display.setFont(self.font)
+        display.setStyleSheet(
+            "background-color: rgb(61, 61, 61);\n"
+            "color: rgb(255, 255, 255);\n"
+            "padding-right: 5"
             )
-        self.display.setAlignment(
+        display.setAlignment(
             QtCore.Qt.AlignRight |
             QtCore.Qt.AlignTrailing |
             QtCore.Qt.AlignVCenter
             )
-        self.display.setText('0')
-        self.verticalLayout.addWidget(self.display)
+        display.setText('0')
+        self.vl.addWidget(display)
+        return display
 
     def _pushed_btn(self, btn):
         if btn.text() == 'C':

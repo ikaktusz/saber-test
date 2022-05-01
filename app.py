@@ -1,10 +1,10 @@
 import sys
-
-from calculator.calc import Calculator, QtWidgets
+from PyQt5 import QtWidgets
+from calculator.calc import Calculator
 
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
-    ui = Calculator()
-    ui.show()
+    calc = Calculator()
+    calc.show()
     sys.exit(app.exec_())
