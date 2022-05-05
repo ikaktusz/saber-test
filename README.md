@@ -6,7 +6,7 @@
 
 `git clone https://github.com/ikaktusz/saber-test.git`  
 `cd saber-test`  
-`pip install -r reqirements.txt`  
+`pip install -r requirements.txt`  
 `python app.py`  
 
 Желательно использовать виртуальное окружение.  
